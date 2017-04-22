@@ -12,15 +12,39 @@ public class VarBean {
 
     private Property<String> type;
 
-    public Property<String> getName() {
+    public String getName() {
+        return name.get();
+    }
+
+    public Property<String> nameProperty() {
         return name;
     }
 
-    public Property<String> getContent() {
+    public void setName(String name) {
+        this.name.set(name);
+    }
+
+    public String getContent() {
+        return content.get();
+    }
+
+    public Property<String> contentProperty() {
         return content;
     }
 
-    public Property<String> getType() {
+    public void setContent(String content) {
+        this.content.set(content);
+    }
+
+    public String getType() {
+        return type.get();
+    }
+
+    public Property<String> typeProperty() {
         return type;
+    }
+
+    public void setType(String type) {
+        this.type.set(type);
     }
 }

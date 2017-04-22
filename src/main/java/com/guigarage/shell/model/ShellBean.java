@@ -11,11 +11,23 @@ public class ShellBean {
 
     private ObservableList<VarBean> variables;
 
-    public Property<String> getCommandline() {
+    public String getCommandline() {
+        return commandline.get();
+    }
+
+    public Property<String> commandlineProperty() {
         return commandline;
+    }
+
+    public void setCommandline(String commandline) {
+        this.commandline.set(commandline);
     }
 
     public ObservableList<VarBean> getVariables() {
         return variables;
+    }
+
+    public void setVariables(ObservableList<VarBean> variables) {
+        this.variables = variables;
     }
 }

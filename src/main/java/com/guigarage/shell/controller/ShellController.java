@@ -27,13 +27,13 @@ public class ShellController {
 
     @DolphinAction("eval")
     public void eval() {
-        List<SnippetEvent> events = shellService.eval(model.getCommandline().get());
+        List<SnippetEvent> events = shellService.eval(model.getCommandline());
         for(SnippetEvent e : events) {
             if(e.snippet() instanceof VarSnippet) {
                 VarBean varBean = beanManager.create(VarBean.class);
-                varBean.getName().set(((VarSnippet) e.snippet()).name());
-                varBean.getContent().set(e.value());
-                varBean.getType().set(((VarSnippet) e.snippet()).typeName());
+                varBean.setName(((VarSnippet) e.snippet()).name());
+                varBean.setContent(e.value());
+                varBean.setType(((VarSnippet) e.snippet()).typeName());
                 model.getVariables().add(varBean);
             }
         }
