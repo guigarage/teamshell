@@ -4,6 +4,11 @@ import com.canoo.dolphin.BeanManager;
 import com.canoo.dolphin.server.DolphinAction;
 import com.canoo.dolphin.server.DolphinController;
 import com.canoo.dolphin.server.DolphinModel;
+import com.canoo.dolphin.server.event.DolphinEventBus;
+import com.canoo.dolphin.server.event.Message;
+import com.canoo.dolphin.server.event.MessageListener;
+import com.guigarage.shell.event.Topics;
+import com.guigarage.shell.event.VarData;
 import com.guigarage.shell.model.ShellBean;
 import com.guigarage.shell.model.VarBean;
 import com.guigarage.shell.service.ShellService;
@@ -11,6 +16,7 @@ import jdk.jshell.SnippetEvent;
 import jdk.jshell.VarSnippet;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 @DolphinController("ShellController")
@@ -23,21 +29,29 @@ public class ShellController {
     private BeanManager beanManager;
 
     @Autowired
+    private DolphinEventBus eventBus;
+
+    @Autowired
     private ShellService shellService;
+
+    @PostConstruct
+    public void init() {
+        eventBus.subscribe(Topics.VAR_CREATED_TOPIC, e -> {
+            add(e.getData());
+        });
+        shellService.getVariables().forEach(v -> add(v));
+    }
+
+    private void add(VarData data) {
+        VarBean bean = beanManager.create(VarBean.class);
+        bean.setName(data.getName());
+        bean.setType(data.getType());
+        bean.setContent(data.getContent());
+        model.getVariables().add(bean);
+    }
 
     @DolphinAction("eval")
     public void eval() {
-        List<SnippetEvent> events = shellService.eval(model.getCommandline().get());
-        for(SnippetEvent e : events) {
-            if(e.snippet() instanceof VarSnippet) {
-                VarBean varBean = beanManager.create(VarBean.class);
-                varBean.getName().set(((VarSnippet) e.snippet()).name());
-                varBean.getContent().set(e.value());
-                varBean.getType().set(((VarSnippet) e.snippet()).typeName());
-                model.getVariables().add(varBean);
-            }
-        }
+        shellService.eval(model.getCommandline());
     }
-
-
 }
